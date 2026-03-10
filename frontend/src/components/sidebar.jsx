@@ -9,6 +9,7 @@ import {
   FaFileAlt,
   FaUserInjured,
   FaUserPlus,
+  FaHeart, 
 } from "react-icons/fa";
 import { MdFeedback } from "react-icons/md";
 
@@ -34,7 +35,9 @@ function Sidebar() {
     { name: "Employee Records", path: "/employee-records", icon: FaFileAlt },
     { name: "patient register", path: "/patient-register", icon: FaFileAlt },
 
-
+    // Cardiology Form (NEW)
+    { name: "Cardiology Form", path: "/cardiology-form", icon: FaHeart }, 
+    { name: "Cardiology List", path: "/cardiology-list", icon: FaHeart },
   ];
 
   return (

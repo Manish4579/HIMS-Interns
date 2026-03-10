@@ -22,6 +22,9 @@ import PatientRecords from "./pages/patientsRecords";
 import RegisterPatient from "./pages/registerPatient";
 import EmployeeRecords from "./pages/employee"
 
+import CardiologyForm from "./pages/CardiologyForm"; 
+import CardiologyList from "./pages/CardiologyList";
+
 function App() {
   return (
     <Flex>
@@ -52,6 +55,9 @@ function App() {
           <Route path="/request" element={<EmployeeRequest />} />
           <Route path="/employee-records" element={<EmployeeRecords />} />
           <Route path="/patient-register" element={< RegisterPatient  />} />
+
+          <Route path="/cardiology-form" element={<CardiologyForm />} /> 
+          <Route path="/cardiology-list" element={<CardiologyList />} />
 
 
 
