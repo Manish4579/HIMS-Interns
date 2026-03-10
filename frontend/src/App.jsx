@@ -1,69 +1,79 @@
-import { Box, Flex } from "@chakra-ui/react";
 import { Routes, Route } from "react-router-dom";
 
-import Sidebar from "./components/sidebar";
+import Layout from "./components/Layout";
+import ProtectedRoute from "./pages/ProtectedRoute";
+import NotFound from "./pages/NotFound";
 
-// Home
+// Login
+import EmployeeLogin from "./pages/EmployeeLogin";
+
+// Dashboard pages
 import Home from "./pages/home";
-
-// Feedback
-import FeedbackForm from "./pages/FeedbackForm";
-import FeedbackList from "./pages/FeedbackList";
-
-// Complaints
 import Complaints from "./pages/complaints";
 import ComplaintList from "./pages/complaint_list";
-
-// Employees
+import FeedbackForm from "./pages/FeedbackForm";
+import FeedbackList from "./pages/FeedbackList";
 import Employee from "./pages/employee";
 import EmployeeRequest from "./pages/EmployeeRequest";
-
 import PatientRecords from "./pages/patientsRecords";
 import RegisterPatient from "./pages/registerPatient";
-import EmployeeRecords from "./pages/employee"
+import EmployeeDashboard from "./pages/employeeDashboard";
 
 import CardiologyForm from "./pages/CardiologyForm"; 
 import CardiologyList from "./pages/CardiologyList";
 
 function App() {
+
   return (
-    <Flex>
-      <Sidebar />
 
-      <Box flex="1" p={5} ml="260px">
-        <Routes>
-          {/* Home */}
-          <Route path="/" element={<Home />} />
+    <Routes>
 
-          {/* Feedback */}
-          <Route path="/feedback" element={<FeedbackForm />} />
-          <Route path="/feedback-list" element={<FeedbackList />} />
+      {/* PUBLIC ROUTE */}
+      <Route path="/login" element={<EmployeeLogin />} />
 
-          {/* Complaints */}
-          <Route path="/complaints" element={<Complaints />} />
-          <Route path="/complaint_list" element={<ComplaintList />} />
+      {/* PROTECTED DASHBOARD ROUTES */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
 
-          {/* Employees */}
-          <Route path="/employee-records" element={<Employee />} />
-          <Route path="/employee-request" element={<EmployeeRequest />} />
+        <Route path="employee-dashboard" element={<ProtectedRoute><EmployeeDashboard /></ProtectedRoute>} />
 
-          {/* Patients */}
-          <Route path="/patient-records" element={<PatientRecords />} />
-          {/* Other Pages */}
-          <Route path="/registerPatient" element={<RegisterPatient />} />
-          <Route path="/employee" element={<Employee />} />
-          <Route path="/request" element={<EmployeeRequest />} />
-          <Route path="/employee-records" element={<EmployeeRecords />} />
-          <Route path="/patient-register" element={< RegisterPatient  />} />
+        <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
 
+<<<<<<< HEAD
           <Route path="/cardiology-form" element={<CardiologyForm />} /> 
           <Route path="/cardiology-list" element={<CardiologyList />} />
 
+=======
+        {/* Feedback */}
+        <Route path="feedback" element={<ProtectedRoute><FeedbackForm /></ProtectedRoute>} />
+        <Route path="feedback-list" element={<ProtectedRoute><FeedbackList /></ProtectedRoute>} />
+>>>>>>> bd5ec6d1cfea1fd9fdd9e9b69d5749803b67af4b
 
+        {/* Complaints */}
+        <Route path="complaints" element={<ProtectedRoute><Complaints /></ProtectedRoute>} />
+        <Route path="complaint_list" element={<ProtectedRoute><ComplaintList /></ProtectedRoute>} />
 
-        </Routes>
-      </Box>
-    </Flex>
+        {/* Employees */}
+        <Route path="employee-records" element={<ProtectedRoute><Employee /></ProtectedRoute>} />
+        <Route path="employee-request" element={<ProtectedRoute><EmployeeRequest /></ProtectedRoute>} />
+
+        {/* Patients */}
+        <Route path="patient-records" element={<ProtectedRoute><PatientRecords /></ProtectedRoute>} />
+        <Route path="patient-register" element={<ProtectedRoute><RegisterPatient /></ProtectedRoute>} />
+
+      </Route>
+
+      {/* 404 */}
+      <Route path="*" element={<ProtectedRoute><NotFound /></ProtectedRoute>} />
+
+    </Routes>
+
   );
 }
 

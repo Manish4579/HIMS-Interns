@@ -15,9 +15,13 @@ import {
   FormErrorMessage,
   useToast,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+
 
 function EmployeeRequest() {
   const toast = useToast();
+    const navigate=useNavigate()
+
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -41,14 +45,25 @@ function EmployeeRequest() {
 
   const fetchNextRequestNumber = async () => {
     try {
+       const token=localStorage.getItem("token")
       const res = await fetch(
-        "http://localhost:3000/request/getNextRequestNumber"
+        "http://localhost:3000/request/getNextRequestNumber",{
+          headers:{
+          "Authorization": `Bearer ${token}`
+  }
+        }
       );
 
-      if (!res.ok) {
-        console.error("API Error:", res.status);
-        return;
-      }
+     if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
 
       const data = await res.json();
       const sequence = data.next_sequence || "001";
@@ -155,14 +170,28 @@ function EmployeeRequest() {
           formDataToSend.append(key, formData[key]);
         }
       });
-
+       const token=localStorage.getItem("token")
       const res = await fetch(
         "http://localhost:3000/request/postRequest",
         {
           method: "POST",
           body: formDataToSend,
+          headers:{
+          "Authorization": `Bearer ${token}`
+  }
+
         }
       );
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
 
       if (res.ok) {
         toast({

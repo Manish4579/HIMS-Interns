@@ -42,9 +42,12 @@ import {
 } from "@chakra-ui/icons";
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function ComplaintList() {
   const toast = useToast();
+
+  const navigate=useNavigate()
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isAssignOpen,
@@ -88,9 +91,23 @@ export default function ComplaintList() {
   // Fetch complaints
   const fetchComplaints = async () => {
     try {
+      const token=localStorage.getItem("token")
       const res = await fetch(
-        "http://localhost:3000/api/complaint_list/getComplaintList",
+        "http://localhost:3000/api/complaint_list/getComplaintList",{
+          headers:{
+          "Authorization": `Bearer ${token}`
+  }}
       );
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const data = await res.json();
 
       if (data.success) {
@@ -109,9 +126,24 @@ export default function ComplaintList() {
 
   const fetchEmployeesData = async () => {
     try {
+      const token=localStorage.getItem("token")
       const res = await fetch(
-        "http://localhost:3000/api/employee/getEmployees",
+        "http://localhost:3000/api/employee/getEmployees",{
+          headers:{
+          "Authorization": `Bearer ${token}`
+  }
+        }
       );
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const data = await res.json();
       if (data.success) {
         setAllEmployees(data.data || []);
@@ -242,9 +274,24 @@ export default function ComplaintList() {
     setSelectedComplaint(complaint);
 
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:3000/complaints/get-complaint-assigned/${complaint.complaint_id}`,
+        `http://localhost:3000/complaints/get-complaint-assigned/${complaint.complaint_id}`,{
+          headers:{
+          "Authorization": `Bearer ${token}`
+  }
+}
       );
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
 
       const data = await res.json();
 
@@ -329,21 +376,28 @@ export default function ComplaintList() {
 
       console.log("API:", url);
       console.log("Body:", bodyData);
-
+       const token=localStorage.getItem("token")
       const response = await fetch(url, {
         method: method,
         headers: {
           "Content-Type": "application/json",
-        },
+         
+          "Authorization": `Bearer ${token}`
+  }
+        ,
         body: JSON.stringify(bodyData),
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Server Error:", response.status, text);
-        throw new Error(`Server error (${response.status})`);
-      }
+      
+      if (response.status === 401) {
 
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
       const result = await response.json();
 
       if (result.success) {
@@ -381,12 +435,25 @@ export default function ComplaintList() {
     }
 
     try {
+       const token=localStorage.getItem("token")
       const response = await fetch(
         `http://localhost:3000/complaints/delete-complaint-assigned/${assignment_id}`,
         {
           method: "DELETE",
+          headers:{
+          "Authorization": `Bearer ${token}`
+  }
         },
       );
+      if (response.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
 
       const data = await response.json();
 

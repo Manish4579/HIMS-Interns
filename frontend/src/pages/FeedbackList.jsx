@@ -42,7 +42,22 @@ function FeedbackList() {
   const fetchFeedbacks = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:3000/feedback/getFeedback");
+       const token=localStorage.getItem("token")
+      const res = await fetch("http://localhost:3000/feedback/getFeedback",{
+        headers:{
+          "Authorization": `Bearer ${token}`
+  }
+      });
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const data = await res.json();
 
       if (data.success) {
@@ -70,10 +85,23 @@ function FeedbackList() {
     if (!window.confirm("Delete this feedback?")) return;
 
     try {
+       const token=localStorage.getItem("token")
       const res = await fetch(
         `http://localhost:3000/feedback/deleteFeedback/${id}`,
-        { method: "DELETE" }
+        { method: "DELETE",headers:{
+          "Authorization": `Bearer ${token}`
+  } }
       );
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const result = await res.json();
 
       if (result.success) {

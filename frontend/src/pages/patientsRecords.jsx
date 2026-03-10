@@ -21,8 +21,11 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import RegisterPatient from "./registerPatient";
+import { useNavigate } from "react-router-dom";
 
 function PatientRecords() {
+      const navigate=useNavigate()
+
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
@@ -30,7 +33,22 @@ function PatientRecords() {
 
   const fetchPatients = async () => {
     try {
-      const res = await fetch("http://localhost:3000/patient/getPatients");
+       const token=localStorage.getItem("token")
+      const res = await fetch("http://localhost:3000/patient/getPatients",{
+        headers:{
+          "Authorization": `Bearer ${token}`
+  }
+      });
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const result = await res.json();
       setPatients(result.data || []);
     } catch (err) {
@@ -47,10 +65,23 @@ function PatientRecords() {
     if (!window.confirm("Delete this record?")) return;
 
     try {
+       const token=localStorage.getItem("token")
       const res = await fetch(
         `http://localhost:3000/patient/deletePatient/${id}`,
-        { method: "DELETE" },
+        { method: "DELETE",headers:{
+          "Authorization": `Bearer ${token}`
+  } },
       );
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
 
       if (res.ok) {
         setPatients((prev) => prev.filter((p) => p.patient_id !== id));

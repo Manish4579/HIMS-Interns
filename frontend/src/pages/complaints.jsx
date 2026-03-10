@@ -19,8 +19,10 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { AttachmentIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
 
 export default function Complaints() {
+  const navigate=useNavigate()
   const toast = useToast();
   const [fileKey, setFileKey] = useState(Date.now());
 
@@ -90,11 +92,24 @@ export default function Complaints() {
         if (key !== "attachment_path" && formData[key] !== null) data.append(key, formData[key]);
       });
       if (formData.attachment_path) data.append("attachment_path", formData.attachment_path);
-
+      const token=localStorage.getItem("token")
       const response = await fetch(
         "http://localhost:3000/complaints/postComplaintMaster",
-        { method: "POST", body: data }
+        { method: "POST", body: data,
+          headers:{
+          "Authorization": `Bearer ${token}`
+  } }
       );
+      if (response.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const result = await response.json();
 
       if (response.ok) {

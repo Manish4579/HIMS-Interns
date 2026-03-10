@@ -6,10 +6,17 @@ import cors from "cors";
 import feedbackRoutes from "./routes/feedback.Routes.js";
 import complaintRoutes from "./routes/complaints.Routes.js";
 import requestRoutes from "./routes/request.routes.js";
+<<<<<<< HEAD
 import employeeRoutes from "./routes/employee.Routes.js";
 import patientRoutes from "./routes/registerPatient.Routes.js";      // renamed for clarity
 import cardiologyRoutes from "./routes/Cardiology.Routes.js";
 
+=======
+import employeeRoutes from "./routes/employee.Routes.js"; 
+import PatientRouter from "./routes/registerPatient.Routes.js";
+import EmployeeRouter from "./routes/employee.Routes.js";
+import EmployeeLoginRouter from "./routes/EmployeeLogin.Routes.js"
+>>>>>>> bd5ec6d1cfea1fd9fdd9e9b69d5749803b67af4b
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -31,6 +38,7 @@ app.use(express.json());
 // Serve static files (uploads folder)
 app.use("/uploads", express.static("uploads"));
 
+<<<<<<< HEAD
 // ================= HEALTH CHECK =================
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -79,6 +87,35 @@ app.use((req, res) => {
   });
 });
 
+=======
+
+// ================= API ROUTES =================
+
+app.use("/api/feedback", patient_feedback);
+app.use("/api/complaint_list", complaintRoutes);
+app.use("/api/request", requestRoutes);
+app.use("/api/employee", employeeRoutes);
+app.use("/feedback", patient_feedback);
+app.use("/complaints", complaintRoutes);
+app.use("/request", requestRoutes);
+app.use("/patient",PatientRouter)
+app.use("/employee",EmployeeRouter)
+app.use("/employee-login", EmployeeLoginRouter)
+app.use((req,res)=>{
+  res.status(404).json({
+    success:false,
+    message:"API route not found"
+  });
+});
+app.use((err,req,res,next)=>{
+  console.error(err);
+
+  res.status(500).json({
+    success:false,
+    message:"Internal Server Error"
+  });
+});
+>>>>>>> bd5ec6d1cfea1fd9fdd9e9b69d5749803b67af4b
 // ================= START SERVER =================
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

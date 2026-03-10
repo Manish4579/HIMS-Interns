@@ -4,13 +4,14 @@ import {
   getNextRequestNumber,
 } from "../controllers/request.controllers.js";
 import upload from "../middleware/upload.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // Get auto request number
-router.get("/getNextRequestNumber", getNextRequestNumber);
+router.get("/getNextRequestNumber", verifyToken,getNextRequestNumber);
 
 // Post request (with existing upload middleware)
-router.post("/postRequest", upload, postRequest);
+router.post("/postRequest",verifyToken, upload, postRequest);
 
 export default router;

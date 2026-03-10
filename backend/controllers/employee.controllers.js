@@ -1,7 +1,20 @@
 import con from "../db.js";
 
 /* ===============================
-   GET ALL EMPLOYEES
+  PASSWORD GENERATOR
+================================ */
+function generatePassword(length = 8) {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+/* ===============================
+  GET ALL EMPLOYEES
 ================================ */
 export const getEmployees = async (req, res) => {
   try {
@@ -29,7 +42,6 @@ export const getEmployees = async (req, res) => {
       count: result.rows.length,
       data: result.rows,
     });
-
   } catch (error) {
     console.error("Get Employees Error:", error);
     return res.status(500).json({
@@ -39,9 +51,8 @@ export const getEmployees = async (req, res) => {
   }
 };
 
-
 /* ===============================
-   REGISTER EMPLOYEE
+  REGISTER EMPLOYEE
 ================================ */
 export const registerEmployee = async (req, res) => {
   try {
@@ -73,12 +84,15 @@ export const registerEmployee = async (req, res) => {
       });
     }
 
+    /* Generate Random Password */
+    const password = generatePassword();
+
     const query = `
       INSERT INTO employee
       (employee_name, gender, dob, email, contact_number,
-       department, designation, qualification,
-       experience_years, status)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      department, designation, qualification,
+      experience_years, status, password)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
       RETURNING 
         employee_id,
         employee_name,
@@ -104,16 +118,16 @@ export const registerEmployee = async (req, res) => {
       qualification ?? null,
       experience_years ?? null,
       status ?? "Active",
+      password,
     ]);
 
     return res.status(201).json({
       success: true,
       message: "Employee registered successfully",
       data: result.rows[0],
+      generated_password: password,
     });
-
   } catch (error) {
-
     if (error.code === "23505") {
       return res.status(409).json({
         success: false,
@@ -129,9 +143,8 @@ export const registerEmployee = async (req, res) => {
   }
 };
 
-
 /* ===============================
-   UPDATE EMPLOYEE
+  UPDATE EMPLOYEE
 ================================ */
 export const updateEmployee = async (req, res) => {
   try {
@@ -211,7 +224,6 @@ export const updateEmployee = async (req, res) => {
       message: "Employee updated successfully",
       data: result.rows[0],
     });
-
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -221,9 +233,8 @@ export const updateEmployee = async (req, res) => {
   }
 };
 
-
 /* ===============================
-   DELETE EMPLOYEE
+  DELETE EMPLOYEE
 ================================ */
 export const deleteEmployee = async (req, res) => {
   try {
@@ -238,7 +249,7 @@ export const deleteEmployee = async (req, res) => {
 
     const result = await con.query(
       "DELETE FROM employee WHERE employee_id = $1 RETURNING *",
-      [employee_id]
+      [employee_id],
     );
 
     if (result.rows.length === 0) {
@@ -252,7 +263,6 @@ export const deleteEmployee = async (req, res) => {
       success: true,
       message: "Employee deleted successfully",
     });
-
   } catch (error) {
     console.error("Delete Error:", error);
     return res.status(500).json({

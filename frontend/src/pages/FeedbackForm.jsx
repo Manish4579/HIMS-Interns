@@ -33,9 +33,11 @@ import {
 import { StarIcon,EditIcon, DeleteIcon,PlusSquareIcon } from "@chakra-ui/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 
+
 const ALL_MODULES = ["Registration", "Doctor Consultation", "Billing"];
 
 function FeedbackForm() {
+
   const toast = useToast();
 
   const [loading, setLoading] = useState(false);
@@ -172,15 +174,27 @@ function FeedbackForm() {
     const method = editData ? "PUT" : "POST";
 
     try {
+       const token=localStorage.getItem("token")
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,
+          "Authorization": `Bearer ${token}`
+  },
         body: JSON.stringify({
           ...formData,
           feedback_mode: "Online",
           module_ratings: includeModules ? savedModules : [],
         }),
       });
+if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
 
       const result = await res.json();
 

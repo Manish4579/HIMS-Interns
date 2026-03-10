@@ -26,9 +26,12 @@ import {
   Th,
   Td,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 function RegisterPatient({  onSave }) {
   const toast = useToast();
+      const navigate=useNavigate()
+
 
   const [tabIndex, setTabIndex] = useState(0);
   const [patients, setPatients] = useState([]);
@@ -56,7 +59,22 @@ function RegisterPatient({  onSave }) {
 
   const fetchPatients = async () => {
     try {
-      const res = await fetch("http://localhost:3000/patient/getPatients");
+       const token=localStorage.getItem("token")
+      const res = await fetch("http://localhost:3000/patient/getPatients",{
+        headers:{
+          "Authorization": `Bearer ${token}`
+  }
+      });
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const result = await res.json();
       setPatients(result.data || []);
     } catch (err) {
@@ -152,12 +170,25 @@ function RegisterPatient({  onSave }) {
     const method = editId ? "PUT" : "POST";
     try {
       setLoading(true);
-
+        const token=localStorage.getItem("token")
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+          headers:{
+          "Authorization": `Bearer ${token}`
+  }
+         },
         body: JSON.stringify(formData),
       });
+if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
 
       const result = await res.json();
 
@@ -205,9 +236,23 @@ function RegisterPatient({  onSave }) {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this record?")) return;
     try {
-      await fetch(`http://localhost:3000/patient/deletePatient/${id}`, {
+       const token=localStorage.getItem("token")
+      const res=await fetch(`http://localhost:3000/patient/deletePatient/${id}`, {
         method: "DELETE",
+        headers:{
+          "Authorization": `Bearer ${token}`
+  }
       });
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       setPatients((prev) => prev.filter((p) => p.patient_id !== id));
       toast({ title: "Deleted Successfully", status: "success" });
     } catch (err) {
@@ -218,7 +263,7 @@ function RegisterPatient({  onSave }) {
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50" p={6}>
       <Box
-        ml="260px"
+        
         maxW="1000px"
         w="100%"
         p={6}

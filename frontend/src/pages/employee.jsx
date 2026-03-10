@@ -23,9 +23,11 @@ import {
   Td,
   useToast,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 function Employee() {
   const toast = useToast();
+  const navigate=useNavigate()
 
   const [tabIndex, setTabIndex] = useState(0);
   const [employees, setEmployees] = useState([]);
@@ -51,7 +53,22 @@ function Employee() {
 
   const fetchEmployees = async () => {
     try {
-     const res = await fetch("http://localhost:3000/api/employee/getEmployees");
+       const token=localStorage.getItem("token")
+     const res = await fetch("http://localhost:3000/api/employee/getEmployees",{
+      headers:{
+          "Authorization": `Bearer ${token}`
+  }
+     });
+     if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
+
       const result = await res.json();
       setEmployees(result.data || []);
     } catch (err) {
@@ -149,12 +166,25 @@ function Employee() {
 
     try {
       setLoading(true);
-
+       const token=localStorage.getItem("token")
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,
+
+          "Authorization": `Bearer ${token}`
+  
+        },
         body: JSON.stringify(formData),
       });
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
 
       const result = await res.json();
 
@@ -196,9 +226,22 @@ function Employee() {
     if (!window.confirm("Delete this record?")) return;
 
     try {
-      await fetch(`http://localhost:3000/api/employee/deleteEmployee/${id}`, {
+      const token=localStorage.getItem("token")
+      const res=await fetch(`http://localhost:3000/api/employee/deleteEmployee/${id}`, {
         method: "DELETE",
+        headers:{
+          "Authorization": `Bearer ${token}`
+  }
       });
+      if (res.status === 401) {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("employee_id");
+  localStorage.removeItem("employee_name");
+
+  navigate("/login");
+  return;
+}
 
       setEmployees((prev) =>
         prev.filter((emp) => emp.employee_id !== id)
